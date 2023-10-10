@@ -39,24 +39,20 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             switch (messageText) {
-                case "/start": {
+                case "/start" -> {
                     startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                    break;
                 }
-                case "read": {
+                case "read" -> {
                     userState.put(chatId, "read");
                     sendMessage(chatId, "You've chosen to read, now enter the text number.");
-                    break;
                 }
-                case "see": {
+                case "see" -> {
                     userState.put(chatId, "see");
                     sendMessage(chatId, "You've chosen to see, now enter the photo number.");
-                    break;
                 }
-                default: {
+                default -> {
                     String state = userState.get(chatId);
                     if ("see".equals(state)) {
-                        // Если состояние "фото", то ожидаем номер фотографии
                         try {
                             int photoNumber = Integer.parseInt(messageText);
                             if (photoNumber > 0 && photoNumber < 101) {
@@ -64,7 +60,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                                 PhotoService photoService = new PhotoService(this);
                                 String url = photoService.getPhoto("photos", modelPhoto, photoNumber);
                                 photoService.sendPhoto(chatId, url);
-                                // Сбрасываем состояние пользователя
                                 userState.remove(chatId);
                             } else {
                                 sendMessage(chatId, "Please enter correct number.(0-100)");
@@ -77,15 +72,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                             throw new RuntimeException("Unable to parse message");
                         }
                     } else if ("read".equals(state)) {
-                        // Если состояние не определено, то ожидаем команду
                         try {
                             int textNumber = Integer.parseInt(messageText);
                             if (textNumber > 0 && textNumber < 101) {
                                 ModelMessage modelMessage = new ModelMessage();
                                 MessageService messageService = new MessageService();
-                                // Сбрасываем состояние пользователя
                                 String resMessage = messageService.getMessage("posts", modelMessage, textNumber);
-                                sendMessage(chatId,resMessage);
+                                sendMessage(chatId, resMessage);
                                 userState.remove(chatId);
                             } else {
                                 sendMessage(chatId, "Please enter correct number.(0-100)");
@@ -100,7 +93,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                     } else {
                         sendMessage(chatId, "Please select the 'see' or 'read' option.");
                     }
-                    break;
                 }
             }
         }
@@ -110,7 +102,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void startCommandReceived(Long chatId, String name) {
         String answer = "Hi, " + name + ", nice to meet you!" + "\n" +
                 "Write down what you want to see or read?" + "\n" +
-                "Write 'see' or 'read'!" ;
+                "Write 'see' or 'read'!";
         sendMessage(chatId, answer);
     }
 
