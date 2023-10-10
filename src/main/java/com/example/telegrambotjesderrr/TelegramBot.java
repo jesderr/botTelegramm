@@ -21,7 +21,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class TelegramBot extends TelegramLongPollingBot {
     private final BotConfig botConfig;
-    private Map<Long, String> userState = new HashMap<>();
+    private Map<Long, String> userState;
 
     @Override
     public String getBotUsername() {
@@ -35,8 +35,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        String message = "";
-
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
@@ -49,15 +47,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                     userState.put(chatId, "read");
                     sendMessage(chatId, "You've chosen to read, now enter the text number.");
                     break;
-//                    try {
-//                        message = MessageService.getMessage("posts", modelMessage);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    } catch (ParseException e) {
-//                        throw new RuntimeException("Unable to parse message");
-//                    }
-//                    sendMessage(chatId, message);
-//                    break;
                 }
                 case "see": {
                     userState.put(chatId, "see");
